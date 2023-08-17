@@ -17,17 +17,9 @@ class TodoListViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-
-        
-        let newItem = Item()
-        newItem.title = "Find Mike"
-        itemArray.append(newItem)
-        print(dataFilePath)
-//        if let items = defaults.array(forKey: "ToDoListArray") as? [Item] {
-//            itemArray = items
-//        }
+        loadItems()
     }
-
+    
     // MARK: - Tableview Datasource Methods
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -48,7 +40,7 @@ class TodoListViewController: UITableViewController {
     }
     // MARK: - Tableview Delegate Methods
     
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {        
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         itemArray[indexPath.row].isDone = !itemArray[indexPath.row].isDone
         
         saveItems()
@@ -63,7 +55,7 @@ class TodoListViewController: UITableViewController {
         var textField = UITextField()
         
         let alert = UIAlertController(title: "Add New Todoey Item", message: "", preferredStyle: .alert)
-            
+        
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             // What will happen once the user taps the Add Item button on our UIAlert
             
@@ -83,7 +75,7 @@ class TodoListViewController: UITableViewController {
         alert.addAction(action)
         
         present(alert, animated: true, completion: nil)
-
+        
     }
     
     // MARK: - Model Manipulation Methods
@@ -101,5 +93,14 @@ class TodoListViewController: UITableViewController {
         self.tableView.reloadData()
     }
     
+    func loadItems() {
+        if let data = try? Data(contentsOf: dataFilePath!) {
+            let decoder = PropertyListDecoder()
+            do {
+                itemArray = try decoder.decode([Item].self, from: data)
+            } catch {
+                print("Error decoding array, \(error)")
+            }
+        }
+    }
 }
-
